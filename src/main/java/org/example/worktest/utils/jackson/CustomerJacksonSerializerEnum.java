@@ -1,12 +1,11 @@
 package org.example.worktest.utils.jackson;
 
 import lombok.Getter;
+import org.example.worktest.utils.jackson.ext.Base64Serializer;
 
 @Getter
 public enum CustomerJacksonSerializerEnum {
-
-    NONE("", "", ""),
-    BASE64("base64", "org.example.worktest.utils.jackson.ext.Base64Serializer", "BASE64编码解码");
+    BASE64("base64", Base64Serializer.class.getName(), "BASE64编码解码");
 
     /**
      * 对应key
