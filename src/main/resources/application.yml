@@ -3,10 +3,41 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
-
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    serialization:
+      FAIL_ON_EMPTY_BEANS: false
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://rmhost:3305/data_source_test?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=UTF-8
+    username: root
+    password: 951753
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      minimum-idle: 8
+      maximum-pool-size: 20
+      auto-commit: true
+      idle-timeout: 30000
+      pool-name: DatebookHikariCP
+      max-lifetime: 60000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
   freemarker:
     cache: true
     check-template-location: true
     charset: utf-8
     suffix: .ftl
     template-loader-path: classpath:templates/freeMarker
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+  type-enums-package: org.liubility.typing.server.constant
+  mapper-locations: classpath:/mappers/*Mapper.xml
+  type-aliases-package: org.liubility.typing.server.domain.entity.*
+  global-config:
+    db-config: #实体类字段上加上@TableLogic注解
+      logic-delete-value: 1 # 逻辑已删除值(默认为 1)
+      logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
