@@ -2,6 +2,8 @@ package com.jdragon.websocket.msgcontrol;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jdragon.websocket.annotation.WsMapping;
+import com.jdragon.websocket.annotation.WsRoute;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
@@ -46,7 +48,7 @@ public class JobController {
 
             // 根据action找到对应的controller并执行方法
             // 这里通过ApplicationContext获取所有带有@Controller注解的bean
-            String[] beanNames = applicationContext.getBeanNamesForAnnotation(Controller.class);
+            String[] beanNames = applicationContext.getBeanNamesForAnnotation(WsRoute.class);
 
             for (String beanName : beanNames) {
                 Object controller = applicationContext.getBean(beanName);
@@ -63,7 +65,7 @@ public class JobController {
 
                 // 遍历所有方法查找匹配的GetMapping
                 for (Method method : controllerClass.getDeclaredMethods()) {
-                    if (method.isAnnotationPresent(GetMapping.class)) {
+                    if (method.isAnnotationPresent(WsMapping.class) && method.isAnnotationPresent(GetMapping.class)) {
                         GetMapping methodMapping = method.getAnnotation(GetMapping.class);
                         if (methodMapping.value().length > 0) {
                             String methodPath = methodMapping.value()[0];
@@ -72,9 +74,9 @@ public class JobController {
 
                             // 如果路径匹配action，则调用该方法
                             if (fullPath.equals("/" + action) || fullPath.equals(action)) {
-
+                                Object[] objects = JsonArgumentConverter.parseMethodParams(method, jsonNode);
                                 // 调用匹配的方法
-                                Object result = method.invoke(controller, message);
+                                Object result = method.invoke(controller, objects);
                                 log.info("Executed method for action: {}, result: {}", action, result);
                                 return;
                             }
@@ -83,7 +85,7 @@ public class JobController {
                 }
             }
 
-            log.debug("No method found for action: {}", action);
+            log.info("No method found for action: {}", action);
         } catch (Exception e) {
             log.error("Error processing message: {}, error: {}", message, e.getMessage(), e);
         }

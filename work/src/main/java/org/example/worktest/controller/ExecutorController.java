@@ -5,6 +5,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jdragon.message.core.MessageBroker;
+import com.jdragon.websocket.annotation.WsMapping;
+import com.jdragon.websocket.annotation.WsParam;
+import com.jdragon.websocket.annotation.WsRoute;
+import com.jdragon.websocket.model.Message;
+import org.example.worktest.entity.Order;
 import org.example.worktest.service.impl.TestWS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +17,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
+@WsRoute
 @RequestMapping("/api/executor")
 @RestController
 public class ExecutorController {
@@ -27,50 +35,29 @@ public class ExecutorController {
         this.testWS = testWS;
     }
 
+
+    @WsMapping
     @GetMapping("/test")
-    public String test(String message) {
-        // 添加具体的业务逻辑
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = null;
-        try {
-            jsonNode = objectMapper.readTree(message);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        String token = jsonNode.has("token") ? jsonNode.get("token").asText() : null;
-        messageBroker.publish(token, "test msg");
+    public String test(@WsParam("token") String token, Message<Order> message, Order order) {
+        messageBroker.publish(token, token + " test msg: " + message);
+        messageBroker.publish(message.getToken(), "test msg 2" + order);
         return "test"; // 返回视图名称或数据
     }
 
+    @WsMapping
     @GetMapping("/join")
-    public String join(String message) {
-        // 添加具体的业务逻辑
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = null;
-        try {
-            jsonNode = objectMapper.readTree(message);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        String token = jsonNode.has("token") ? jsonNode.get("token").asText() : null;
+    public String join(@WsParam("token") String token) {
         testWS.join(token);
         return "test"; // 返回视图名称或数据
     }
 
+    @WsMapping
     @GetMapping("/exit")
-    public String exit(String message) {
-        // 添加具体的业务逻辑
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = null;
-        try {
-            jsonNode = objectMapper.readTree(message);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        String token = jsonNode.has("token") ? jsonNode.get("token").asText() : null;
+    public String exit(@WsParam("token") String token) {
         testWS.exit(token);
         return "test"; // 返回视图名称或数据
     }
+
 
     @GetMapping("/subscribe")
     public String subscribe(String message) {
