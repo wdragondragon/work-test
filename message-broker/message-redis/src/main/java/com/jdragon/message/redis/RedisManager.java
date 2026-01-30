@@ -19,7 +19,6 @@ public class RedisManager {
     private final JedisPool jedisPool;
 
 
-
     public RedisManager(RedisConfig redisConfig) {
         this.jedisPool = jedisPool(redisConfig);
     }
@@ -33,7 +32,7 @@ public class RedisManager {
         config.setTestOnReturn(true);
         // 禁用JMX避免MBean注册异常
         config.setJmxEnabled(false);
-        return new JedisPool(config, redisConfig.getHost(), redisConfig.getPort());
+        return new JedisPool(config, redisConfig.getHost(), redisConfig.getPort(), 2000, redisConfig.getPassword(), redisConfig.getDatabase());
     }
 
     public void publishMessage(String channel, String message) {

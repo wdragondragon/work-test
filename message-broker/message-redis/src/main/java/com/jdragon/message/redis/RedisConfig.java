@@ -9,6 +9,10 @@ public class RedisConfig {
 
     private int port;
 
+    private String password;
+
+    private int database;
+
     private int maxTotal;
 
     private int maxIdle;
