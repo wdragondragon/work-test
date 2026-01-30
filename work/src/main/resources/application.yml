@@ -10,7 +10,7 @@ spring:
       FAIL_ON_EMPTY_BEANS: false
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.43.161:3306/data_source_test?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=UTF-8
+    url: jdbc:mysql://192.168.188.128:3306/data_source_test?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=UTF-8
     username: root
     password: 951753
     type: com.zaxxer.hikari.HikariDataSource
@@ -30,7 +30,7 @@ spring:
     suffix: .ftl
     template-loader-path: classpath:templates/freeMarker
   redis:
-    host: 192.168.43.161
+    host: 192.168.188.128
     port: 6379
     database: 0
 
@@ -48,15 +48,33 @@ mybatis-plus:
 
 message:
   broker:
-    type: redis
-    config:
-      host: 192.168.43.161
-      port: 6379
-      maxTotal: 20
-      maxIdle: 10
-      minIdle: 5
-
-#    type: local
+#    type: redis
 #    config:
-#      threadPoolSize: 10
-#      poolNamePrefix: websocket-exec-
+#      host: 192.168.43.161
+#      port: 6379
+#      maxTotal: 20
+#      maxIdle: 10
+#      minIdle: 5
+
+    type: local
+    config:
+      threadPoolSize: 10
+      poolNamePrefix: websocket-exec-
+
+flink:
+  rest:
+    address: ${FLINK_REST_HOST:192.168.188.128}
+    port: ${FLINK_REST_PORT:8081}
+    cluster-id: ${FLINK_CLUSTER_ID:standalone}
+  storage:
+    job-id-dir: ${JOB_ID_DIR:/var/data/flink/job-id-latest/}
+    savepoint-dir: ${SAVEPOINT_DIR:/var/data/flink/savepoint-latest/}
+  job:
+    default-parallelism: ${FLINK_PARALLELISM:1}
+    allow-non-restored-state: true
+    max-restore-attempts: 3
+  client:
+    connection-timeout: 30000
+    request-timeout: 60000
+    retry-count: 3
+    retry-delay: 1000
